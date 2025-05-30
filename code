@@ -1,0 +1,200 @@
+import pygame
+import math
+pygame.init()
+
+start_time=0
+clock = pygame.time.Clock()
+screen_width = 1000
+screen_height = 750
+screen = pygame.display.set_mode((screen_width, screen_height))
+bg=pygame.image.load('scary.png')
+broom=pygame.image.load('idk.png')
+broom_rect=broom.get_rect()
+broom_x_pos=500
+broom1=pygame.image.load('idk.png')
+
+broom1_rect=broom1.get_rect()
+broom1_x_pos=700
+
+
+broom2=pygame.image.load('idk.png')
+broom2_rect=broom2.get_rect()
+broom2_x_pos=1000
+
+
+
+
+
+
+
+# Change this to False so game starts at intro screen
+game_active = False
+# Add a new variable for intro screen
+game_started = False
+
+game_font = pygame.font.SysFont('Comic Sans MS', 50)
+game_message = game_font.render('Press Space to Start', True, (255,255,255))
+game_rect = game_message.get_rect(center=(500,300))
+
+# Add title text
+title_font = pygame.font.SysFont('Comic Sans MS', 80)
+title_text = title_font.render('Quidditch', True, (255,255,255))
+title_rect = title_text.get_rect(center=(500,200))
+
+# Rest of your variables remain the same...
+
+bg_width=bg.get_width()
+scroll=0
+tiles=math.ceil(screen_width/bg_width)+1
+test_font=pygame.font.SysFont('Comic Sans MS',30)
+
+title_font = pygame.font.SysFont('Comic Sans MS', 80)
+title_text = title_font.render('Quidditch', True, (255,255,255))
+title_rect = title_text.get_rect(center=(500,200))
+
+
+
+
+
+def display_score():
+    current_time=int(pygame.time.get_ticks()/1000) -start_time
+    score_surf=test_font.render(str(current_time),True,(0,0,0))
+    score_rect=score_surf.get_rect(center=(500,50))
+    screen.blit(score_surf,score_rect)
+
+
+
+
+class Player:
+    def __init__(self,x,y):
+        self.speed=9
+        self.image=pygame.image.load('C:\\Users\\whw00\\Desktop\\playerv2.png')
+        self.image=pygame.transform.scale(self.image,(100,100))
+        self.rect=self.image.get_rect(topleft=(x,y))
+    def move(self):
+        keys=pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:  # Left arrow or A key
+            self.rect.x -= self.speed
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:  # Right arrow or D key
+            self.rect.x += self.speed
+
+            # Vertical movement
+        if keys[pygame.K_UP] or keys[pygame.K_w]:  # Up arrow or W key
+            self.rect.y -= self.speed
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:  # Down arrow or S key
+            self.rect.y += self.speed
+
+
+player=Player(0,0)
+
+pygame.display.set_caption('Quiditch')
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    if not game_started:
+        # Show start screen
+        screen.fill((0, 0, 0))
+        screen.blit(title_text, title_rect)
+        screen.blit(game_message, game_rect)
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            game_started = True
+            game_active = True
+            start_time = int(pygame.time.get_ticks()/1000)
+    
+    elif game_active:
+        # Your existing game code here
+        for i in range(0,tiles):
+            screen.blit(bg,(i*bg_width+scroll,0))
+
+        player.move()
+
+        if player.rect.top <= 0:
+            player.rect.top = 0
+        if player.rect.bottom >= 750:
+            player.rect.bottom = 750
+
+        if player.rect.left <= -1:
+            player.rect.left = -1
+
+        if player.rect.right >= 1000:
+            player.rect.right = 1000
+
+        scroll-=5
+
+        if abs(scroll) > bg_width:
+            scroll=0
+
+        screen.blit(player.image,player.rect)
+
+        screen.blit(broom,(broom_x_pos,300))
+        broom_x_pos-=14
+        broom_rect.x=broom_x_pos
+        broom_rect.y=300
+
+
+
+        if broom_x_pos < -20:
+            broom_x_pos = screen_width
+
+        if player.rect.colliderect(broom_rect):
+            game_active = False
+
+
+        screen.blit(broom1,(broom1_x_pos,100))
+        broom1_x_pos-=10
+        broom1_rect.x=broom1_x_pos
+        broom1_rect.y=100
+
+
+        if broom1_x_pos < -50:
+            broom1_x_pos = screen_width
+
+
+
+        if player.rect.colliderect(broom1_rect):
+            game_active = False
+
+        screen.blit(broom2, (broom2_x_pos, 600))
+        broom2_x_pos -= 8
+        broom2_rect.x = broom2_x_pos
+        broom2_rect.y = 600
+
+        if broom2_x_pos < -50:
+            broom2_x_pos = screen_width
+
+        if player.rect.colliderect(broom2_rect):
+            game_active = False
+
+
+
+
+
+    else:
+        # Game over screen
+        screen.fill((0, 0, 0))
+        game_screen = test_font.render('GAME OVER', True, (255, 255, 255))
+        game_screen_rect = game_screen.get_rect(topleft=(500, 50))
+        screen.blit(game_screen, game_screen_rect)
+        space_screen = game_font.render('HIT SPACE TO PLAY AGAIN', True, (255, 255, 255))
+        space_screen_rect = space_screen.get_rect(topleft=(200, 300))
+        screen.blit(space_screen, space_screen_rect)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            game_active = True
+            player.rect.topleft = (0, 0)
+            broom_x_pos = screen_width
+            start_time = int(pygame.time.get_ticks()/1000)
+
+    if game_started:
+        display_score()
+    
+    pygame.display.update()
+    clock.tick(60)
+
+pygame.quit()
