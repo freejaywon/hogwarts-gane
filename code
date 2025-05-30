@@ -104,7 +104,7 @@ while running:
     player.fly_sound.play()
     if not game_started:
         # Show start screen
-        screen.fill((0, 0, 0))
+        screen.fill("#38353b")
         screen.blit(title_text, title_rect)
         screen.blit(game_message, game_rect)
         
@@ -178,7 +178,7 @@ while running:
 
 
         screen.blit(broom2, (broom2_x_pos, 600))
-        broom2_x_pos -= 8
+        broom2_x_pos -= 15
         broom2_rect.x = broom2_x_pos
         broom2_rect.y = 600
 
@@ -216,20 +216,20 @@ while running:
 
     else:
         player.fly_sound.stop()
-        screen.fill((0, 0, 0))
+        screen.fill("#38353b")
         game_screen = test_font.render('GAME OVER', True, (255, 255, 255))
-        game_screen_rect = game_screen.get_rect(topleft=(500, 50))
+        game_screen_rect = game_screen.get_rect(topleft=(400, 200))
         screen.blit(game_screen, game_screen_rect)
         space_screen = game_font.render('HIT SPACE TO PLAY AGAIN', True, (255, 255, 255))
-        space_screen_rect = space_screen.get_rect(topleft=(200, 300))
+        space_screen_rect = space_screen.get_rect(topleft=(170, 270))
         screen.blit(space_screen, space_screen_rect)
         high_score_text = test_font.render(f'High Score: {high_score}', True, (255, 255, 255))
-        high_score_rect = high_score_text.get_rect(center=(500, 200))
+        high_score_rect = high_score_text.get_rect(center=(490, 400))
         screen.blit(high_score_text, high_score_rect)
 
         # Display final score
         final_score_text = test_font.render(f'Your Score: {current_score}', True, (255, 255, 255))
-        final_score_rect = final_score_text.get_rect(center=(500, 300))
+        final_score_rect = final_score_text.get_rect(center=(30, 20))
         screen.blit(final_score_text, final_score_rect)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
