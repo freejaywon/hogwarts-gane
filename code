@@ -6,6 +6,8 @@ start_time=0
 clock = pygame.time.Clock()
 screen_width = 1000
 screen_height = 750
+high_score = 0
+current_score = 0
 screen = pygame.display.set_mode((screen_width, screen_height))
 bg=pygame.image.load('scary.png')
 broom=pygame.image.load('idk.png')
@@ -22,14 +24,19 @@ broom2_rect=broom2.get_rect()
 broom2_x_pos=1000
 
 
+broom3=pygame.image.load('idk.png')
+broom3_rect=broom3.get_rect()
+broom3_x_pos=1000
 
 
 
 
 
-# Change this to False so game starts at intro screen
+
+
+
 game_active = False
-# Add a new variable for intro screen
+
 game_started = False
 
 game_font = pygame.font.SysFont('Comic Sans MS', 50)
@@ -50,7 +57,7 @@ test_font=pygame.font.SysFont('Comic Sans MS',30)
 
 title_font = pygame.font.SysFont('Comic Sans MS', 80)
 title_text = title_font.render('Quidditch', True, (255,255,255))
-title_rect = title_text.get_rect(center=(500,200))
+
 
 
 
@@ -58,7 +65,7 @@ title_rect = title_text.get_rect(center=(500,200))
 
 def display_score():
     current_time=int(pygame.time.get_ticks()/1000) -start_time
-    score_surf=test_font.render(str(current_time),True,(0,0,0))
+    score_surf=test_font.render(str(current_time),True,"white")
     score_rect=score_surf.get_rect(center=(500,50))
     screen.blit(score_surf,score_rect)
 
@@ -68,9 +75,10 @@ def display_score():
 class Player:
     def __init__(self,x,y):
         self.speed=9
-        self.image=pygame.image.load('C:\\Users\\whw00\\Desktop\\playerv2.png')
-        self.image=pygame.transform.scale(self.image,(100,100))
+        self.image=pygame.image.load('newone.png')
+        self.image=pygame.transform.scale(self.image,(50,50))
         self.rect=self.image.get_rect(topleft=(x,y))
+        self.fly_sound=pygame.mixer.Sound('music.wav')
     def move(self):
         keys=pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:  # Left arrow or A key
@@ -87,13 +95,13 @@ class Player:
 
 player=Player(0,0)
 
-pygame.display.set_caption('Quiditch')
+pygame.display.set_caption('Quidditch')
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+    player.fly_sound.play()
     if not game_started:
         # Show start screen
         screen.fill((0, 0, 0))
@@ -141,8 +149,12 @@ while running:
         if broom_x_pos < -20:
             broom_x_pos = screen_width
 
-        if player.rect.colliderect(broom_rect):
+        if player.rect.colliderect(broom_rect):  # Collision with broom
             game_active = False
+
+            current_score = int(pygame.time.get_ticks() / 1000) - start_time
+            if current_score > high_score:
+                high_score = current_score  # Update high score
 
 
         screen.blit(broom1,(broom1_x_pos,100))
@@ -156,8 +168,14 @@ while running:
 
 
 
-        if player.rect.colliderect(broom1_rect):
+        if player.rect.colliderect(broom1_rect):  # Collision with broom1
             game_active = False
+
+            current_score = int(pygame.time.get_ticks() / 1000) - start_time
+            if current_score > high_score:
+                high_score = current_score
+
+
 
         screen.blit(broom2, (broom2_x_pos, 600))
         broom2_x_pos -= 8
@@ -167,15 +185,37 @@ while running:
         if broom2_x_pos < -50:
             broom2_x_pos = screen_width
 
-        if player.rect.colliderect(broom2_rect):
+        if player.rect.colliderect(broom2_rect):  # Collision with broom2
             game_active = False
+
+            current_score = int(pygame.time.get_ticks() / 1000) - start_time
+            if current_score > high_score:
+                high_score = current_score
+#################################################################
+        screen.blit(broom3, (broom3_x_pos, 479))
+        broom3_x_pos -= 20
+        broom3_rect.x = broom3_x_pos
+        broom3_rect.y = 479
+
+        if broom3_x_pos < -100:
+            broom3_x_pos = screen_width
+
+        if player.rect.colliderect(broom3_rect):  # Collision with broom3
+            game_active = False
+
+            current_score = int(pygame.time.get_ticks() / 1000) - start_time
+            if current_score > high_score:
+                high_score = current_score
+
+
+
 
 
 
 
 
     else:
-        # Game over screen
+        player.fly_sound.stop()
         screen.fill((0, 0, 0))
         game_screen = test_font.render('GAME OVER', True, (255, 255, 255))
         game_screen_rect = game_screen.get_rect(topleft=(500, 50))
@@ -183,7 +223,14 @@ while running:
         space_screen = game_font.render('HIT SPACE TO PLAY AGAIN', True, (255, 255, 255))
         space_screen_rect = space_screen.get_rect(topleft=(200, 300))
         screen.blit(space_screen, space_screen_rect)
+        high_score_text = test_font.render(f'High Score: {high_score}', True, (255, 255, 255))
+        high_score_rect = high_score_text.get_rect(center=(500, 200))
+        screen.blit(high_score_text, high_score_rect)
 
+        # Display final score
+        final_score_text = test_font.render(f'Your Score: {current_score}', True, (255, 255, 255))
+        final_score_rect = final_score_text.get_rect(center=(500, 300))
+        screen.blit(final_score_text, final_score_rect)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             game_active = True
@@ -191,7 +238,7 @@ while running:
             broom_x_pos = screen_width
             start_time = int(pygame.time.get_ticks()/1000)
 
-    if game_started:
+    if game_started and game_active:
         display_score()
     
     pygame.display.update()
