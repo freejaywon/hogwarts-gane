@@ -1,2 +1,2 @@
-# hogwarts-gane
+# hogwarts-game
 hogwarts game
